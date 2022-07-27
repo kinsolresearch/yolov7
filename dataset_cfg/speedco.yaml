@@ -1,0 +1,10 @@
+# train and val datasets (image directory or *.txt file with image paths)
+train: dataset_cfg/lists/speedco_dataset_train_images.txt
+val: dataset_cfg/lists/speedco_dataset_val_images.txt
+# test: dataset_cfg/lists/speedco_dataset_val_images.txt
+
+# number of classes
+nc: 1
+
+# class names
+names: ['truck']
