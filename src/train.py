@@ -499,7 +499,8 @@ def train(hyp, opt, device, tb_writer=None):
                                           save_dir=save_dir,
                                           save_json=True,
                                           plots=False,
-                                          is_coco=is_coco)
+                                          is_coco=is_coco,
+                                          dvc_metrics_path=opt.dvc_metrics_path)
 
         # Strip optimizers
         final = best if best.exists() else last  # final model
@@ -555,6 +556,7 @@ if __name__ == '__main__':
     parser.add_argument('--bbox_interval', type=int, default=-1, help='Set bounding-box image logging interval for W&B')
     parser.add_argument('--save_period', type=int, default=-1, help='Log model after every "save_period" epoch')
     parser.add_argument('--artifact_alias', type=str, default="latest", help='version of dataset artifact to be used')
+    parser.add_argument('--dvc-metrics-path', type=str, default='metrics.json', help='path to store dvc metrics file')
     opt = parser.parse_args()
 
     # Set DDP variables
