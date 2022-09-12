@@ -346,8 +346,10 @@ class LoadStreams:  # multiple IP or RTSP cameras
 
 def img2label_paths(img_paths):
     # Define label paths as a function of image paths
-    sa, sb = os.sep + 'JPEGImages' + os.sep, os.sep + 'labels' + os.sep  # /images/, /labels/ substrings
-    return ['txt'.join(x.replace(sa, sb, 1).rsplit(x.split('.')[-1], 1)) for x in img_paths]
+    #sa, sb = os.sep + 'JPEGImages' + os.sep, os.sep + 'labels' + os.sep  # /images/, /labels/ substrings
+    #return ['txt'.join(x.replace(sa, sb, 1).rsplit(x.split('.')[-1], 1)) for x in img_paths]
+    return [x.replace('JPEGImages', 'labels').replace('.jpg', '.txt') for x in img_paths]
+
 
 
 class LoadImagesAndLabels(Dataset):  # for training/testing
@@ -363,6 +365,11 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         self.stride = stride
         self.path = path        
         #self.albumentations = Albumentations() if augment else None
+        print(f'path={path}, prefix={prefix}')
+
+        #sm_input_dir = Path('/opt/ml/input/data/train')
+        # image_dir = root_dir / 'JPEGImages'
+        # print(list(root_dir.glob('*')))
 
         try:
             f = []  # image files
@@ -380,6 +387,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 else:
                     raise Exception(f'{prefix}{p} does not exist')
             self.img_files = sorted([x.replace('/', os.sep) for x in f if x.split('.')[-1].lower() in img_formats])
+            # Append sagemaker prefix to path
+            #self.img_files = [str(image_dir / x) for x in self.img_files]
             # self.img_files = sorted([x for x in f if x.suffix[1:].lower() in img_formats])  # pathlib
             assert self.img_files, f'{prefix}No images found'
         except Exception as e:
@@ -472,6 +481,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         x = {}  # dict
         nm, nf, ne, nc = 0, 0, 0, 0  # number missing, found, empty, duplicate
         pbar = tqdm(zip(self.img_files, self.label_files), desc='Scanning images', total=len(self.img_files))
+        print("Caching labels...")
         for i, (im_file, lb_file) in enumerate(pbar):
             try:
                 # verify images

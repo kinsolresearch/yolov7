@@ -39,7 +39,8 @@ def test(data,
          compute_loss=None,
          half_precision=True,
          trace=False,
-         is_coco=False):
+         is_coco=False,
+         dvc_metrics_path=None):
     # Initialize/load model and set device
     training = model is not None
     if training:  # called by train.py
@@ -144,7 +145,8 @@ def test(data,
                 for *xyxy, conf, cls in predn.tolist():
                     xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                     line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
-                    with open(save_dir / 'labels' / (path.stem + '.txt'), 'a') as f:
+                    fpath = save_dir / 'labels' / (path.stem + '.txt')
+                    with open(fpath, 'a') as f:
                         f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
             # W&B logging - Media Panel Plots
@@ -247,10 +249,15 @@ def test(data,
     if wandb_images:
         wandb_logger.log({"Bounding Box Debugger/Images": wandb_images})
 
+    if dvc_metrics_path is not None:
+        print(f"Saving metrics to {dvc_metrics_path}")
+        with open(dvc_metrics_path, 'w') as f:
+            json.dump({'mean_precision': mp, 'mean_recall': mr, 'map': map.item(), 'map50': map50.item()}, f)
+
     # Save JSON
     if save_json and len(jdict):
         w = Path(weights[0] if isinstance(weights, list) else weights).stem if weights is not None else ''  # weights
-        anno_json = './coco/annotations/instances_val2017.json'  # annotations json
+        anno_json = '/coco/annotations/instances_val2017.json'  # annotations json
         pred_json = str(save_dir / f"{w}_predictions.json")  # predictions json
         print('\nEvaluating pycocotools mAP... saving %s...' % pred_json)
         with open(pred_json, 'w') as f:
@@ -300,6 +307,7 @@ if __name__ == '__main__':
     parser.add_argument('--save-hybrid', action='store_true', help='save label+prediction hybrid results to *.txt')
     parser.add_argument('--save-conf', action='store_true', help='save confidences in --save-txt labels')
     parser.add_argument('--save-json', action='store_true', help='save a cocoapi-compatible JSON results file')
+    parser.add_argument('--dvc-metrics-path', type=str, default=None, help='path to save metrics.json')
     parser.add_argument('--project', default='runs/test', help='save to project/name')
     parser.add_argument('--name', default='exp', help='save to project/name')
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
@@ -325,6 +333,7 @@ if __name__ == '__main__':
              save_hybrid=opt.save_hybrid,
              save_conf=opt.save_conf,
              trace=not opt.no_trace,
+             dvc_metrics_path=opt.dvc_metrics_path,
              )
 
     elif opt.task == 'speed':  # speed benchmarks
