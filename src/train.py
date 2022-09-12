@@ -508,8 +508,7 @@ def train(hyp, opt, device, tb_writer=None):
             if f.exists():
                 strip_optimizer(f)  # strip optimizers
         if opt.bucket:
-            logger.info('Uploading model to %s...' % opt.bucket)
-            os.system(f'aws s3 cp {final} aws://{opt.bucket}/weights')  # upload
+            os.system(f'gsutil cp {final} gs://{opt.bucket}/weights')  # upload
         if wandb_logger.wandb and not opt.evolve:  # Log the stripped model
             wandb_logger.wandb.log_artifact(str(final), type='model',
                                             name='run_' + wandb_logger.wandb_run.id + '_model',
