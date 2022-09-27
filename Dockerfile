@@ -6,8 +6,9 @@ FROM 763104351884.dkr.ecr.us-west-2.amazonaws.com/pytorch-training:1.11-gpu-py38
 
 # /opt/ml and all subdirectories are utilized by SageMaker, we use the /code 
 #subdirectory to store our user code.
-ENV SM_CODE_DIR=/opt/ml/code/
+ENV SM_CODE_DIR=/opt/ml/code
 ENV PATH="{SM_CODE_DIR}:${PATH}"
+#RUN echo $SM_CODE_DIR
 
 
 COPY cfg $SM_CODE_DIR/cfg
