@@ -1,6 +1,6 @@
 FROM nvcr.io/nvidia/pytorch:22.05-py3
 
-ENV CODE_DIR=/app
+ENV CODE_DIR=/yolo
 ENV PATH="{CODE_DIR}:${PATH}"
 
 COPY cfg $CODE_DIR/cfg
@@ -9,11 +9,8 @@ COPY dataset_cfg $CODE_DIR/dataset_cfg
 COPY src $CODE_DIR/src
 COPY scripts $CODE_DIR/scripts
 COPY weights $CODE_DIR/weights
-#COPY model_data $CODE_DIR/model_data
 COPY Pipfile $CODE_DIR/
 COPY Pipfile.lock $CODE_DIR/
-COPY train.sh $CODE_DIR/
-COPY test.sh $CODE_DIR/
 
 WORKDIR $CODE_DIR
 

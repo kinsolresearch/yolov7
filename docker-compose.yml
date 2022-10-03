@@ -1,0 +1,17 @@
+---
+version: '2.3'
+
+services:
+  train:
+    image: gcr.io/kinsol-generic/yolov7:${TAG:-dev}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    runtime: nvidia
+    volumes:
+      - .:/yolo
+      - /mnt/NAS/Public/datasets/speedco_dataset:/yolo/speedco_dataset
+    command: 
+      - train.sh
+    shm_size: 64g
+    working_dir: /yolo
