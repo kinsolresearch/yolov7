@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # The name of our algorithm
 algorithm_name=yolov7-gpu
@@ -17,9 +18,10 @@ then
     aws ecr create-repository --repository-name "${algorithm_name}" > /dev/null
 fi
 # Get the login command from ECR and execute it directly
-$(aws ecr get-login --region ${region} --no-include-email)
+#$(aws ecr get-login-password --region ${region})
+$(aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${account}.dkr.ecr.${region}.amazonaws.com)
 # Get the login command from ECR in order to pull down the SageMaker PyTorch image
-$(aws ecr get-login --registry-ids 520713654638 --region ${region} --no-include-email)
+$(aws ecr get-login-password --registry-ids 520713654638 --region ${region})
 # Build the docker image locally with the image name and then push it to ECR
 # with the full name.
 echo "Building $algorithm_name"
