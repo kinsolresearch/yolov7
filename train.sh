@@ -1,0 +1,1 @@
+python src/train.py --workers 8 --device 0 --batch-size 10 --data dataset_cfg/speedco_small.yaml --img 640 640 --cfg cfg/training/yolov7.yaml --weights weights/yolov7_training.pt --name yolov7-speedco --hyp data/hyp.scratch.p5.yaml

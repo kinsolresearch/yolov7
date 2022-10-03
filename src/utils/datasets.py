@@ -346,8 +346,8 @@ class LoadStreams:  # multiple IP or RTSP cameras
 
 def img2label_paths(img_paths):
     # Define label paths as a function of image paths
-    sa, sb = os.sep + 'JPEGImages' + os.sep, os.sep + 'labels' + os.sep  # /images/, /labels/ substrings
-    return ['txt'.join(x.replace(sa, sb, 1).rsplit(x.split('.')[-1], 1)) for x in img_paths]
+    return [x.replace('JPEGImages', 'labels').replace('.jpg', '.txt') for x in img_paths]
+
 
 
 class LoadImagesAndLabels(Dataset):  # for training/testing
@@ -363,6 +363,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         self.stride = stride
         self.path = path        
         #self.albumentations = Albumentations() if augment else None
+        print(f'Loading images and labels from {path}, prefix={prefix}')
 
         try:
             f = []  # image files
@@ -472,6 +473,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         x = {}  # dict
         nm, nf, ne, nc = 0, 0, 0, 0  # number missing, found, empty, duplicate
         pbar = tqdm(zip(self.img_files, self.label_files), desc='Scanning images', total=len(self.img_files))
+        print("Caching labels...")
         for i, (im_file, lb_file) in enumerate(pbar):
             try:
                 # verify images
