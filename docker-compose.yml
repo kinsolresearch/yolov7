@@ -11,7 +11,10 @@ services:
     volumes:
       - .:/yolo
       - /mnt/NAS/Public/datasets/speedco_dataset:/yolo/speedco_dataset
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/groups:/etc/groups:ro
+    user: 1007:1007
     command: 
-      - train.sh
+      - bash
     shm_size: 64g
     working_dir: /yolo
